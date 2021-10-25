@@ -96,9 +96,6 @@ module.exports = {
 
         // if (!emailSending) {
         //     await user.destroy({ paranoid: false })
-        //     return next(
-        //         createError('Something went wrong, please try again later', 500)
-        //     )
         // }
 
         return res.apiCreated('Verify email to proceed')
