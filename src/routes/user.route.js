@@ -13,12 +13,12 @@ const router = express.Router()
 router
     .route('/users')
     .post(
-        authWrapper('public', 'client', 'admin:createUser'),
+        authWrapper('admin:createUser'),
         validatorWrapper(userValidator.create),
         userController.create
     )
     .get(
-        authWrapper('public', 'client', 'admin:viewUser'),
+        authWrapper('admin:viewUser'),
         validatorWrapper(),
         userController.getMany
     )
@@ -26,12 +26,12 @@ router
 router
     .route('/users/:id')
     .get(
-        authWrapper('public', 'client', 'admin:viewUser'),
+        authWrapper('admin:viewUser'),
         validatorWrapper(userValidator.get),
         userController.get
     )
     .patch(
-        authWrapper('public', 'client', 'admin:updateUser'),
+        authWrapper('admin:updateUser'),
         validatorWrapper(userValidator.update),
         userController.update
     )

@@ -1,5 +1,4 @@
 const logging = require('../utils/logging')
-const { CustomAPIError } = require('../errors/custom-error')
 
 const errorHandler = (error, req, res, next) => {
     logging.error('Server', '', error)

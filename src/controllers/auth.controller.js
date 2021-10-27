@@ -1,5 +1,5 @@
 const asyncWrapper = require('../../core/middlewares/wrappers/asyncWrapper')
-const { User, Token } = require('../models')
+const { User, Token, UserRole, UserPermission } = require('../models')
 const { Op } = require('sequelize')
 const jwt = require('../../core/utils/jwt')
 const moment = require('moment')
@@ -10,17 +10,33 @@ const bcrypt = require('bcrypt')
 
 module.exports = {
     login: asyncWrapper(async (req, res, next) => {
-        const { url, body, cookies } = req
+        const { body, cookies } = req
         let { refreshToken } = cookies
         const { email, password } = body
 
-        let where = {}
-
-        where.email = email
-
-        if (url.indexOf('admin') > -1) where.type = 'admin'
-
-        const user = await User.findOne({ where })
+        let user = await User.findOne({
+            where: { email },
+            attributes: {
+                exclude: ['createdAt', 'updatedAt']
+            },
+            include: [
+                {
+                    model: UserRole,
+                    as: 'userRole',
+                    attributes: ['name', 'description'],
+                    include: [
+                        {
+                            model: UserPermission,
+                            as: 'userPermissions',
+                            attributes: ['name', 'module'],
+                            through: {
+                                attributes: []
+                            }
+                        }
+                    ]
+                }
+            ]
+        })
 
         if (!user) return res.apiError('Invalid email or password')
 
@@ -28,12 +44,9 @@ module.exports = {
 
         if (!isValidPassword) return res.apiError('Invalid email or password')
 
-        if (!user.isVerified && user.type != 'admin') {
-            // resend email
-
-            return res.apiError(
-                'Email not verified, code has been sent to your email'
-            )
+        user = {
+            ...user.dataValues,
+            password: undefined
         }
 
         if (refreshToken) {
@@ -45,13 +58,7 @@ module.exports = {
             })
         }
 
-        const accessToken = jwt.generateAccessToken({
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            type: user.type
-        })
+        const accessToken = jwt.generateAccessToken(user)
 
         refreshToken = jwt.generateRefreshToken({
             email: user.email
@@ -64,12 +71,12 @@ module.exports = {
         })
 
         res.cookie('refreshToken', refreshToken, {
-            expires: new Date(moment().add(1, 'months').toDate()),
+            expires: moment().add(1, 'months').toDate(),
             httpOnly: true,
             signed: config.NODE_ENV == 'prod'
         })
 
-        return res.apiOk('Login successfully', { accessToken })
+        return res.apiOk('Login successfully', { user, accessToken })
     }),
 
     register: asyncWrapper(async (req, res, next) => {
@@ -145,34 +152,34 @@ module.exports = {
     }),
 
     logout: asyncWrapper(async (req, res, next) => {
-        let { refreshToken } = req.cookie
+        const { refreshToken } = req.cookie
 
         if (!refreshToken) return res.apiError('Missing refresh token')
 
         const jwtRefreshToken = config.JWT_ACCESS_TOKEN
 
-        let user, type
-        if (url.indexOf('admin') > -1) type = admin
+        let user
 
         try {
             const decoded = jsonwebtoken.verify(refreshToken, jwtRefreshToken)
 
             user = await User.findOne({
                 where: {
-                    email: decoded.email,
-                    refreshToken,
-                    type
+                    email: decoded.email
                 }
             })
         } catch (error) {}
 
         if (user) {
-            refreshToken = jwt.generateRefreshToken({
-                email: moment().format('lll')
+            await Token.destroy({
+                where: {
+                    userId: user.id,
+                    token: refreshToken
+                }
             })
-
-            await user.save()
         }
+
+        res.clearCookie('refreshToken')
 
         return res.apiOk('Logout successfully')
     }),

@@ -8,10 +8,13 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        static associate({ Token, User }) {
+        static associate({ UserRole }) {
             // define association here
 
-            this.hasMany(Token, { foreignKey: 'userId' })
+            this.belongsTo(UserRole, {
+                foreignKey: 'userRoleId',
+                as: 'userRole'
+            })
         }
     }
 
@@ -59,13 +62,8 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: 'pending'
             },
-            createdAt: {
-                allowNull: false,
-                type: DataTypes.DATE
-            },
-            updatedAt: {
-                allowNull: false,
-                type: DataTypes.DATE
+            userRoleId: {
+                type: DataTypes.INTEGER
             }
         },
         {

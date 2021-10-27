@@ -8,6 +8,9 @@ const authWrapper = (...auth) => {
 
     if (Array.isArray(auth[0])) items = auth[0]
 
+    // include dev authType
+    items.push('dev')
+
     if (items.length > 0) {
         const authType = new AuthType()
 
@@ -27,9 +30,6 @@ const authWrapper = (...auth) => {
             throw new Error(`Invalid auth ${item}`)
         })
     }
-
-    if (items.length == 0 || (items.length == 1 && items[0] == 'public'))
-        return (req, res, next) => next()
 
     return [authenticate, ...items, authValidator]
 }
