@@ -1,5 +1,5 @@
 const asyncWrapper = require('../../core/middlewares/wrappers/asyncWrapper')
-const { User } = require('../models')
+const { User, UserRole, UserPermission } = require('../models')
 
 module.exports = {
     create: asyncWrapper(async (req, res, next) => {
@@ -62,7 +62,24 @@ module.exports = {
 
         const user = await User.findOne({
             where: { id },
-            attributes: { exclude: ['password'] }
+            attributes: { exclude: ['password'] },
+            include: [
+                {
+                    model: UserRole,
+                    as: 'userRole',
+                    attributes: ['name', 'description'],
+                    include: [
+                        {
+                            model: UserPermission,
+                            as: 'userPermissions',
+                            attributes: ['name', 'module'],
+                            through: {
+                                attributes: []
+                            }
+                        }
+                    ]
+                }
+            ]
         })
 
         if (!user) return res.apiError('User not found', user)

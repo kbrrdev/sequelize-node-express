@@ -12,16 +12,19 @@ const router = express.Router()
 
 router
     .route('/auth/login')
-    .post(validatorWrapper(authValidator.login), authController.login)
+    .post(
+        authWrapper('public'),
+        validatorWrapper(authValidator.login),
+        authController.login
+    )
 
-router
-    .route('/auth/logout')
-    .post(authWrapper('public', 'client', 'admin'), authController.logout)
+router.route('/auth/logout').post(authWrapper('public'), authController.logout)
 
 router
     .route('/auth/refresh-token')
-    .post(authWrapper('public'), authController.refreshToken)
+    .post(authWrapper('public', 'client', 'admin'), authController.refreshToken)
 
+// admin
 router
     .route('/auth/admin/login')
     .post(

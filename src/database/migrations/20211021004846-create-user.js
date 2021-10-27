@@ -41,6 +41,9 @@ module.exports = {
                 allowNull: false,
                 defaultValue: 'pending'
             },
+            userRoleId: {
+                type: DataTypes.INTEGER
+            },
             createdAt: {
                 allowNull: false,
                 type: DataTypes.DATE
