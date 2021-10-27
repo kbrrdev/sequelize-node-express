@@ -33,19 +33,19 @@ module.exports = {
             },
             {
                 id: 6,
-                parentId: 1,
+                parentId: 5,
                 name: 'Create User Role',
                 module: 'createUserRole'
             },
             {
                 id: 7,
-                parentId: 1,
+                parentId: 5,
                 name: 'Update User Role',
                 module: 'updateUserRole'
             },
             {
                 id: 8,
-                parentId: 1,
+                parentId: 5,
                 name: 'View User Role',
                 module: 'viewUserRole'
             }
