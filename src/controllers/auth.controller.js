@@ -152,7 +152,7 @@ module.exports = {
     }),
 
     logout: asyncWrapper(async (req, res, next) => {
-        const { refreshToken } = req.cookie
+        const { refreshToken } = req.cookies
 
         if (!refreshToken) return res.apiError('Missing refresh token')
 

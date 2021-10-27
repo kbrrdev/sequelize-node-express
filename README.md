@@ -4,6 +4,6 @@
 
 ```sh
 npm install
-sequelize db:migrate:all
+sequelize db:migrate
 sequelize db:seed:all
 ```

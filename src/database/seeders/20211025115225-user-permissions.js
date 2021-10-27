@@ -3,7 +3,6 @@
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         await queryInterface.bulkInsert('user_permissions', [
-            // users
             {
                 id: 1,
                 parentId: 0,
@@ -27,27 +26,25 @@ module.exports = {
                 name: 'View User',
                 module: 'viewUser'
             },
-
-            // user roles
             {
-                id: 1,
+                id: 5,
                 parentId: 0,
                 name: 'User Roles'
             },
             {
-                id: 2,
+                id: 6,
                 parentId: 1,
                 name: 'Create User Role',
-                module: 'createUser'
+                module: 'createUserRole'
             },
             {
-                id: 3,
+                id: 7,
                 parentId: 1,
                 name: 'Update User Role',
                 module: 'updateUserRole'
             },
             {
-                id: 4,
+                id: 8,
                 parentId: 1,
                 name: 'View User Role',
                 module: 'viewUserRole'
